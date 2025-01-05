@@ -14,9 +14,10 @@ if (!$conn) {
 }
 
 // Verificar si se han enviado los datos requeridos (player_id y products)
-if (isset($_POST['player_id']) && isset($_POST['products'])) {
+if (isset($_POST['player_id']) && isset($_POST['game_id']) && isset($_POST['products'])) {
     $player_id = $_POST['player_id'];
     $json_products = $_POST['products'];
+    $game_id = $_POST['game_id'];
     $product_ids = json_decode($json_products, true)['products']; // Acceder directamente al array de productos
 
     if (is_array($product_ids) && !empty($product_ids)) {
@@ -24,9 +25,9 @@ if (isset($_POST['player_id']) && isset($_POST['products'])) {
 
         foreach ($product_ids as $product_id) {
             // Generar un `shopping_list_id` único para cada producto
-            $query = "INSERT INTO Shopping_Lists (Shopping_List_Id, Product_Id, Player_Id) 
-                      VALUES (uuid_generate_v4(), $1, $2) RETURNING Shopping_List_Id";
-            $result = pg_query_params($conn, $query, array($product_id, $player_id));
+            $query = "INSERT INTO Shopping_Lists (Shopping_List_Id, Product_Id, Game_id, Player_Id) 
+                      VALUES (uuid_generate_v4(), $1, $2, $3) RETURNING Shopping_List_Id";
+            $result = pg_query_params($conn, $query, array($product_id, $game_id, $player_id));
 
             if ($result) {
                 // Obtener el `shopping_list_id` generado
